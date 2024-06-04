@@ -4,16 +4,9 @@ This is a project assignment given by Bilkent University in the CS 223 course.
 
 A simplified UART device has registers to store both the incoming and outgoing data. The communication happens at a pre-determined frequency called the baud rate. Baud rate expresses how many bits per second are sent over when the communication is initiated. Both sides must also agree on the amount of parity bits, stop bits, and the length of the data frame for UART to work properly.
 
-At the end of stage 1, your board design can transmit and receive 1-byte of data. Important points to note:
- You can load according to the rightmost 8 switches by pressing BTND button.
- You display the 8-bit wide register on the rightmost 8 LEDs.
- You signal the start of the tranmission by the press of BTNC button.
- Your receiver automatically detects the incoming transmission and stores it in the register.
- You display the 8-bit wide register on the leftmost 8 LEDs.
-
 
 These are the specifications for the UART design:
-*8 data bits per transmission (each transmission is a byte).
+* 8 data bits per transmission (each transmission is a byte).
 * 1 parity bit.Even parity is used.
 * 1 stop bit.
 
