@@ -11,8 +11,8 @@ These are the specifications for the UART design:
 * 1 stop bit.
 
 
-Also the uart design has first in first out (FIFO) structure. Two 4-byte memory for storing transmitted and received data is allocated. The receiver register files are designed to operate as a FIFO structure, discarding the earliest received data when the 5th byte arrives and there is no additional space. 
+The uart design has first in first out (FIFO) structure. Two 4-byte memory for storing transmitted and received data is allocated. The receiver register files are designed to operate as a FIFO structure, discarding the earliest received data when the 5th byte arrives and there is no additional space. 
 
-The datas can be seen from the seven segment display on the basys 3 board.
+The datas int the receiver and transmitter memory can be seen from the seven segment display on the basys 3 board.
 
 Also as an additional feature, pressing a specified button triggers the automatic transfer. In this process, the whole data in the transmitter will be transferred in one wire (line) and receiver takes that to its FIFO memory.
