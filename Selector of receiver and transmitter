@@ -1,0 +1,11 @@
+`timescale 1ns / 1ps
+
+module choose_r_or_t( input logic clk,
+input logic out_btn, output logic choose_r
+);
+
+always_ff @(posedge clk)begin if(out_btn)begin
+choose_r <= !choose_r; 
+end
+end 
+endmodule
