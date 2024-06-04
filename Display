@@ -1,0 +1,66 @@
+`timescale 1ns / 1ps
+module uart_display(
+input logic clock,
+input logic right_b_out,
+input logic left_b_out,
+input logic [31:0] transmitter_memo, input logic [31:0] receiver_memo,
+ output reg [3:0] an,
+output logic [6:0] segment, input logic choose_r_disp
+);
+logic [1:0] case_index = 0; logic [1:0] count_anod;
+logic [19:0] ref_rate = 20'b0; logic [1:0] transmitter_index; logic [1:0] receiver_index; logic [7:0] segment_display;
+reg [3:0] first_digit;
+reg [3:0] second_digit;
+reg [3:0] third_digit;
+reg [4:0] fourth_digit;
+reg [4:0] led_of_display = 0;
+always @(posedge clock) begin
+first_digit <= segment_display[3:0]; second_digit <= segment_display[7:4]; if(choose_r_disp)begin
+third_digit <= receiver_index;
+fourth_digit <= 16; end
+else begin
+third_digit <= transmitter_index; fourth_digit <= 17;
+end
+if(choose_r_disp && (receiver_index == 0))begin
+segment_display[7:0] <= receiver_memo[7:0]; end
+if(choose_r_disp && (receiver_index == 1))begin segment_display[7:0] <= receiver_memo[15:8];
+end
+if(choose_r_disp && (receiver_index == 2))begin segment_display[7:0] <= receiver_memo[23:16];
+end
+if(choose_r_disp && (receiver_index == 3))begin
+
+ segment_display[7:0] <= receiver_memo[31:24]; end
+if(!choose_r_disp && (transmitter_index == 0))begin segment_display[7:0] <= transmitter_memo[7:0];
+end
+if(!choose_r_disp && (transmitter_index == 1))begin segment_display[7:0] <= transmitter_memo[15:8];
+end
+if(!choose_r_disp && (transmitter_index == 2))begin segment_display[7:0] <= transmitter_memo[23:16];
+end
+if(!choose_r_disp && (transmitter_index == 3))begin segment_display[7:0] <= transmitter_memo[31:24];
+end
+if(choose_r_disp && right_b_out)begin receiver_index <= receiver_index+1;
+end
+if(!choose_r_disp && right_b_out)begin transmitter_index <= transmitter_index+1;
+end
+if(choose_r_disp && left_b_out)begin receiver_index <= receiver_index-1;
+end
+if(!choose_r_disp && left_b_out)begin transmitter_index <= transmitter_index-1;
+end end
+always @(posedge clock) begin
+if (count_anodr> 1) count_anodr <= 2'b00;
+else
+count_anod <=count_anod + 1;
+
+ref_rate <= ref_rate + 1;
+case_index <= ref_rate[19:18]; end
+always_ff @(posedge clock) begin
+case (case_index)
+0: begin an = 4'b1110; led_of_display = first_digit; end
+1: begin an = 4'b1101; led_of_display = second_digit; end 2: begin an = 4'b1011; led_of_display = third_digit; end
+3: begin an = 4'b0111; led_of_display = fourth_digit; end
+endcase end
+always_ff @(posedge clock) begin
+case (led_of_display)
+0 : segment = 7'b0000001; 1 : segment = 7'b1001111; 2 : segment = 7'b0010010; 3 : segment = 7'b0000110; 4 : segment = 7'b1001100; 5 : segment = 7'b0100100; 6 : segment = 7'b0100000; 7 : segment = 7'b0001111; 8 : segment = 7'b0000000; 9 : segment = 7'b0000100; 10 : segment = 7'b0001000; 11 : segment = 7'b1100000; 12 : segment = 7'b1110010; 13 : segment = 7'b1000010; 14 : segment = 7'b0110000; 15 : segment = 7'b0111000; 16 : segment = 7'b1111010; 17 : segment = 7'b1110000;
+default : segment = 7'b1111111; endcase
+end endmodule
