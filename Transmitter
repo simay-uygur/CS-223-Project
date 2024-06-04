@@ -1,0 +1,63 @@
+`timescale 1ns / 1ps
+
+module transmitter_uart #(parameter count_per_bit = 868)( input logic clk,
+input logic load_b_out,
+input logic transmit_b_out,
+input logic [7:0] input_data_switches, output logic transmitter_uart,
+output logic [7:0] sent_data,
+output logic [31:0] transmitter_memo
+);
+
+logic parity_bit;
+ reg [15:0] counter = 0;
+reg [8:0] sended_data = 0;
+localparam idle = 2'b00; localparam start = 2'b01; localparam send_bit = 2'b10; localparam stop = 2'b11;
+reg [1:0] state = 0;
+reg [3:0] current_bit = 0;
+always @(posedge clk) begin case(state)
+idle: begin
+transmitter_uart <=1; counter <= 0; current_bit <= 0;
+if(load_b_out)begin
+transmitter_memo[31:24] <= transmitter_memo[23:16]; transmitter_memo[23:16] <= transmitter_memo[15:8]; transmitter_memo[15:8] <= transmitter_memo[7:0]; transmitter_memo[7:0] <= input_data_switches[7:0];
+end
+sended_data[7:0] <= transmitter_memo[31:24]; sent_data[7:0] <= sended_data[7:0]; if(transmit_b_out) begin
+parity_bit = sended_data[0]^sended_data[1]^sended_data[2]^sended_data[3]^ sended_data[4]^sended_data[5]^sended_data[6]^sended_data[7]; sended_data[8] <= parity_bit;
+transmitter_memo[31:24] <= transmitter_memo[23:16]; transmitter_memo[23:16] <= transmitter_memo[15:8];
+transmitter_memo[15:8] <= transmitter_memo[7:0]; transmitter_memo[7:0] <= 0;
+state <= start;
+end
+else begin
+state <= idle; end
+end start: begin
+transmitter_uart <= 0;
+
+if(counter < (count_per_bit - 1)) begin counter = counter + 1;
+state <= start;
+end
+else begin
+counter <= 0;
+state <= send_bit; end
+end
+send_bit: begin
+transmitter_uart <= sended_data[current_bit];
+if(counter < (count_per_bit - 1)) begin counter <= counter + 1;
+state <= send_bit;
+end
+else begin
+counter <= 0; if(current_bit < 8) begin
+current_bit <= current_bit + 3'b1;
+state <= send_bit; end
+else begin current_bit <= 0; state <= stop;
+end end
+end
+stop: begin
+transmitter_uart <= 1;
+if(counter < (count_per_bit - 1)) begin
+counter= counter + 1;
+state <= stop; end
+else begin state <= idle;
+end end
+default:
+state <= idle;
+endcase end
+endmodule
