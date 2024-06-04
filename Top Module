@@ -1,0 +1,23 @@
+`timescale 1ns / 1ps
+
+module top_module(
+input logic clk,
+input logic load_button,
+input logic transmit_button,
+input logic right_button,
+input logic left_button,
+input logic choose_r_disp,
+input logic [7:0] input_data_switches, output logic [7:0] received_led_out, output logic [7:0] data_sent,
+output logic [3:0] an, output logic [6:0] segment
+);
+
+wire tx_rx_line;
+logic [31:0] receiver_memo; logic [31:0] transmitter_memo;
+logic load_b_out; logic transmit_b_out; logic right_b_out; logic left_b_out;
+button_debouncer deb1(clk, load_button, load_b_out); button_debouncer deb2(clk,transmit_button,transmit_b_out); button_debouncer deb3(clk, left_button, left_b_out); button_debouncer deb4(clk,right_button,right_b_out); button_debouncer deb5(clk,choose_r_disp,r_is_true_out);
+choose_r_or_t check_r(clk,r_is_true_out,choosing_r_or_t);
+uart_display disp(clk, right_b_out , left_b_out , transmitter_memo, receiver_memo, an, segment, choosing_r_or_t);
+transmitter_uart tr(clk, load_b_out, transmit_b_out, input_data_switches, tx_rx_line, data_sent, transmitter_memo);
+receiver_uart receiver(clk, tx_rx_line, received_led_out, receiver_memo); 
+
+endmodule
